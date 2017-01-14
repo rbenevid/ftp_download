@@ -5,6 +5,7 @@
 import unittest
 import os.path
 from repositorio import Repositorio
+from ftp import Ftp
 
 class Tests(unittest.TestCase):
     """ Testes """
@@ -31,6 +32,14 @@ class Tests(unittest.TestCase):
         self.assertTrue(os.path.join(self.repositorio_teste,
                                      os.path.basename(arquivo_a_ser_movido)))
 
+    def test_ftp(self):
+        """ Testa o ftp """
+        ftp = Ftp('127.0.0.1', 'anonymous', 'email@a.com')
+        ftp.conecta(2121)
+        ftp.muda_diretorio('')
+        arquivos = ftp.lista_arquivos()
+        self.assertGreater(len(arquivos), 0)
+        print arquivos
 
 
 
