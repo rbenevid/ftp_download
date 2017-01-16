@@ -10,13 +10,13 @@ import shutil
 
 class Repositorio(object):
     """ Representa o repositório local de pdfs """
-    arquivos = {}
 
     def __init__(self, diretorio):
         """ Inicializa o objeto """
+        self.arquivos = {}
         self.diretorio = diretorio
         if os.path.isdir(self.diretorio):
-            self.mascara = os.path.join(self.diretorio, '*.pdf')
+            self.mascara = os.path.join(self.diretorio, '*')
         else:
             self.mascara = self.diretorio
             self.diretorio = os.path.dirname(self.diretorio)
@@ -37,4 +37,8 @@ class Repositorio(object):
         """ Move o arquivo passado pro repositório """
         if os.path.isfile(arquivo):
             shutil.move(arquivo, self.diretorio)
+
+    def numero_arquivos(self):
+        """ Retorna a quantidade de arquivos no repositorio """
+        return len(self.arquivos)
 
