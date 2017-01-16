@@ -2,6 +2,7 @@
 """
     Acesso ao FTP
 """
+import logging
 from ftplib import FTP
 
 class Ftp(object):
@@ -48,8 +49,10 @@ class EntradaFtp(object):
     tipo = None
     data = None
     nome = None
+    tamanho = None
 
     def __init__(self, linha_mlsd):
+        logging.debug(linha_mlsd)
         for item in linha_mlsd.split(';'):
             atribuicao = item.partition('=')
             if atribuicao[1] == '=':
@@ -58,6 +61,8 @@ class EntradaFtp(object):
                     self.tipo = atribuicao[2]
                 elif campo == 'modify':
                     self.data = atribuicao[2]
+                elif campo == 'size':
+                    self.tamanho = atribuicao[2]
             else:
                 self.nome = item.strip()
 
