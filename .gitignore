@@ -1,2 +1,4 @@
 *.pyc
 tags
+.vscode/**
+config_stj.json
