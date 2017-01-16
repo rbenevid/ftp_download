@@ -26,12 +26,16 @@ class Repositorio(object):
         """ Limpa o hash e recarrega do disco """
         self.arquivos.clear()
         for arquivo in glob.iglob(self.mascara):
-            self.arquivos[os.path.basename(arquivo)] = 1
+            self.arquivos[os.path.basename(arquivo)] = os.path.getsize(arquivo)
 
     def existe(self, arquivo):
         """ Retorna true se o arquivo passado existe. Testa só o basename """
         arquivo = os.path.basename(arquivo)
         return self.arquivos.has_key(arquivo)
+
+    def get_tamanho(self, arquivo):
+        """ Retorna o tamanho do arquivo """
+        return self.arquivos[arquivo] if self.arquivos.has_key(arquivo) else -1
 
     def move_arquivo_pro_repositorio(self, arquivo):
         """ Move o arquivo passado pro repositório """
