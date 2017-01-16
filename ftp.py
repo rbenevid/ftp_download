@@ -3,7 +3,20 @@
     Acesso ao FTP
 """
 import logging
+import os.path
+import time
 from ftplib import FTP
+
+def convert_bytes(num):
+    """
+    this function will convert bytes to MB.... GB... etc
+    """
+    if isinstance(num, str):
+        num = int(num)
+    for unidade in ['bytes', 'KB', 'MB', 'GB', 'TB']:
+        if num < 1024.0:
+            return "%3.1f %s" % (num, unidade)
+        num /= 1024.0
 
 class Ftp(object):
     """ Representa uma conexão com servidor FTP """
@@ -43,6 +56,47 @@ class Ftp(object):
                     retorno.append(entrada)
             return retorno
 
+    def download(self, item, tamanho, destino):
+        """ Faz o download do item """
+        down = DownloadFtp(item, tamanho, destino)
+        self.ftp.retrbinary('RETR %s' % item, down.grava_dados, 65536)
+        down.close()
+
+
+class DownloadFtp(object):
+    """ Auxilia o download FTP """
+    def __init__(self, arquivo, tamanho, destino):
+        self.arquivo = arquivo
+        self.destino = destino
+        self.tamanho = int(tamanho)
+        if os.path.isdir(self.destino):
+            self.destino = os.path.join(self.destino, self.arquivo)
+        self.andamento = 0
+        self.ponteiro = open(self.destino, 'w')
+        self.start = time.time()
+
+    def close(self):
+        """ Fecha o ponteiro do arquivo """
+        fim = time.time()
+        elapsed = fim - self.start
+        if elapsed == 0:
+            velocidade = 'n/a'
+        else:
+            velocidade = self.andamento / elapsed
+        print ''
+        logging.info('Download concluído. Tempo %ss. Velocidade %s bytes/sec',
+                     round(elapsed, 1), convert_bytes(velocidade))
+        self.ponteiro.close()
+
+    def grava_dados(self, dados):
+        """ Andamento do download """
+        tamanho = len(dados)
+        if self.tamanho is not None and self.tamanho > 0:
+            self.andamento += tamanho
+            perc = self.andamento * 100.0 / self.tamanho
+            print '\rAndamento: %.1f%%' % (perc),
+        self.ponteiro.write(dados)
+
 
 class EntradaFtp(object):
     """ Representa um arquivo no ftp """
@@ -62,7 +116,7 @@ class EntradaFtp(object):
                 elif campo == 'modify':
                     self.data = atribuicao[2]
                 elif campo == 'size':
-                    self.tamanho = atribuicao[2]
+                    self.tamanho = int(atribuicao[2])
             else:
                 self.nome = item.strip()
 
