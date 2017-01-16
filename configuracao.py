@@ -16,6 +16,7 @@ class Configuracao(object):
         self.usuario = None
         self.senha = None
         self.diretorio = None
+        self.valido = False
 
     def limpa(self):
         """ Limpa a configuração atual """
@@ -25,6 +26,7 @@ class Configuracao(object):
         self.usuario = None
         self.senha = None
         self.diretorio = None
+        self.valido = False
 
     def carrega_de_arquivo_json(self, arquivo):
         """ Carrega a configuracao de um arquivo JSON """
@@ -36,8 +38,10 @@ class Configuracao(object):
                 self.usuario = config['usuario']
                 self.senha = config['senha']
                 self.diretorio = config['diretorio']
+                self.valido = True
         except (OSError, IOError, ValueError):
             self.limpa()
+
 
 def main():
     """ Execução de teste """
